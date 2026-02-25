@@ -1,0 +1,1259 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+components/elements/RadioButton.js
+components/layout/Layout.js
+components/templates/AddToDoPage.js
+components/templates/signinPage.js
+components/templates/signupPage.js
+eslint.config.mjs
+jsconfig.json
+LICENSE
+models/User.js
+next.config.mjs
+package.json
+public/favicon.ico
+public/file.svg
+public/globe.svg
+public/next.svg
+public/vercel.svg
+public/window.svg
+README.md
+src/pages/_app.js
+src/pages/_document.js
+src/pages/add-todo.js
+src/pages/api/auth/[...nextauth].js
+src/pages/api/auth/signup.js
+src/pages/api/auth/todos.js
+src/pages/index.js
+src/pages/signin.js
+src/pages/signup.js
+src/styles/globals.css
+utils/auth.js
+utils/connectDB.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="components/elements/RadioButton.js">
+import React from "react";
+
+function RadioButton({ status, setStatus, value, title, children }) {
+  return (
+    <div className="add-form__input--second">
+      <div className={value}>
+        {children}
+        <label htmlFor={value}>&nbsp;{title}</label>
+        <input
+          type="radio"
+          id={value}
+          name={value}
+          value={value}
+          checked={status === value}
+          onChange={(e) => setStatus(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default RadioButton;
+</file>
+
+<file path="components/layout/Layout.js">
+import Link from "next/link";
+import { VscListSelection } from "react-icons/vsc";
+import { BiMessageSquareAdd } from "react-icons/bi";
+import { RxDashboard } from "react-icons/rx";
+
+function Layout({ children }) {
+  return (
+    <div className="container">
+      <header>
+        <p>NexaTask By Soroush</p>
+      </header>
+      <div className="container--main">
+        <aside>
+          <p>Welcome 👋</p>
+          <ul>
+            <li>
+              <VscListSelection />
+              <Link href="/">Todos</Link>
+            </li>
+            <li>
+              <BiMessageSquareAdd />
+              <Link href="/add-todo">Add Todo</Link>
+            </li>
+            <li>
+              <RxDashboard />
+              <Link href="/profile">Profile</Link>
+            </li>
+          </ul>
+        </aside>
+        <section> {children} </section>
+      </div>
+    </div>
+  );
+}
+
+export default Layout;
+</file>
+
+<file path="components/templates/AddToDoPage.js">
+import { GrAddCircle } from "react-icons/gr";
+import { BsAlignStart } from "react-icons/bs";
+import { useState } from "react";
+import RadioButton from "../elements/RadioButton";
+import { FiSettings } from "react-icons/fi";
+import { AiOutlineSearch } from "react-icons/ai";
+import { MdDoneAll } from "react-icons/md";
+import { TbFileDescription } from "react-icons/tb";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+function AddToDoPage() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("todo");
+
+  const addHandler = async () => {
+    const res = await fetch("/api/auth/todos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, status }),
+    });
+    const data = await res.json();
+    if (data.status === "success") {
+      setTitle("");
+      setDescription("");
+      setStatus("todo");
+      toast.success("Todo added successfully!");
+    }
+
+    console.log(data);
+  };
+
+  return (
+    <div className="add-form">
+      <h2>
+        <GrAddCircle />
+        Add New Todo
+      </h2>
+      <div className="add-form__input">
+        <div className="add-form__input--first">
+          <label htmlFor="title">Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="e.g. Buy Groceries"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <RadioButton
+          status={status}
+          setStatus={setStatus}
+          value="todo"
+          title="Todo"
+        >
+          <BsAlignStart />
+        </RadioButton>
+        <RadioButton
+          status={status}
+          setStatus={setStatus}
+          value="inProgress"
+          title="In Progress"
+        >
+          <FiSettings />
+        </RadioButton>
+        <RadioButton
+          status={status}
+          setStatus={setStatus}
+          value="review"
+          title="Review"
+        >
+          <AiOutlineSearch />
+        </RadioButton>
+        <RadioButton
+          status={status}
+          setStatus={setStatus}
+          value="done"
+          title="Done"
+        >
+          <MdDoneAll />
+        </RadioButton>
+        <div className="add-form__input--third">
+          <label htmlFor="description">
+            <TbFileDescription />
+            Description
+          </label>
+          <textarea
+            maxLength="200"
+            rows="4"
+            cols="50"
+            id="description"
+            name="description"
+            placeholder="e.g. Buy milk, eggs, and bread"
+            onChange={(e) => setDescription(e.target.value)}
+          ></textarea>
+        </div>
+        <button className="add-form__input--button" onClick={addHandler}>
+          Add Todo
+        </button>
+      </div>
+      <ToastContainer />
+    </div>
+  );
+}
+
+export default AddToDoPage;
+</file>
+
+<file path="components/templates/signinPage.js">
+import { signIn, useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+
+function SigninPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const { status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status]);
+  const signInHandler = async () => {
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (!res.error) {
+      router.push("/");
+    }
+    console.log(res);
+  };
+
+  return (
+    <div>
+      <div className="signin-form">
+        <h3>Login</h3>
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={signInHandler}>Sign In</button>
+        <div>
+          <p>Create an account? </p>
+          <Link href="/signup">Sign Up</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SigninPage;
+</file>
+
+<file path="components/templates/signupPage.js">
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+
+function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const { status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status]);
+
+  const signUpHandler = async () => {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    console.log(data);
+    if (data.status === "success") {
+      router.push("/signin");
+    }
+    return data;
+  };
+
+  return (
+    <div className="signin-form">
+      <h3>Registration Form</h3>
+
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button onClick={signUpHandler}>Sign Up</button>
+      <div>
+        <p>Have an account? </p>
+        <Link href="/signin">Sign In</Link>
+      </div>
+    </div>
+  );
+}
+
+export default SignupPage;
+</file>
+
+<file path="models/User.js">
+import { Schema, model, models } from "mongoose";
+
+const userSchema = new Schema({
+  name: {
+    type: String,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+  },
+  todos: [
+    {
+      title: String,
+      status: String,
+      description: String,
+      dueDate: Date,
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    immutable: true,
+  },
+});
+
+const User = models.User || model("User", userSchema);
+
+export default User;
+</file>
+
+<file path="src/pages/add-todo.js">
+import React from "react";
+import AddToDoPage from "../../components/templates/AddToDoPage";
+
+function AddTodo() {
+  return <AddToDoPage />;
+}
+
+export default AddTodo;
+</file>
+
+<file path="src/pages/api/auth/[...nextauth].js">
+import NextAuth from "next-auth";
+import User from "../../../../models/User";
+import connectDB from "../../../../utils/connectDB";
+import { verifyPassword } from "../../../../utils/auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+const authOptions = {
+  session: { strategy: "jwt" },
+  providers: [
+    CredentialsProvider({
+      async authorize(credentials, req) {
+        const { email, password } = credentials;
+
+        try {
+          await connectDB();
+        } catch (error) {
+          throw new Error("Error in connecting to DB!");
+        }
+
+        if (!email || !password) {
+          throw new Error("Invalid Data!");
+        }
+
+        const user = await User.findOne({ email: email });
+
+        if (!user) throw new Error("User doesn't exist!");
+
+        const isValid = await verifyPassword(password, user.password);
+
+        if (!isValid) throw new Error("Username or password is incorrect!");
+
+        return { email };
+      },
+    }),
+  ],
+};
+
+export default NextAuth(authOptions);
+</file>
+
+<file path="src/pages/api/auth/signup.js">
+import User from "../../../../models/User";
+import { hashPassword } from "../../../../utils/auth";
+import connectDB from "../../../../utils/connectDB";
+
+async function handler(req, res) {
+  if (req.method !== "POST") return;
+
+  try {
+    await connectDB();
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ status: "failed", message: "Error in connecting to DB" });
+  }
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(422).json({
+      status: "failed",
+      message: "Invalid data",
+    });
+  }
+
+  const existingUser = await User.findOne({ email: email });
+
+  if (existingUser) {
+    return res
+      .status(422)
+      .json({ status: "failed", message: "User exists already!" });
+  }
+
+  const hashedPassword = await hashPassword(password);
+
+  const newUser = await User.create({ email: email, password: hashedPassword });
+  console.log(newUser);
+
+  res.status(201).json({ status: "success", message: "Created user!" });
+}
+
+export default handler;
+</file>
+
+<file path="src/pages/api/auth/todos.js">
+import { getSession } from "next-auth/react";
+import connectDB from "../../../../utils/connectDB";
+import { getServerSession } from "next-auth";
+
+export default async function handler(req, res) {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ status: "failed", message: "Error in connecting to DB" });
+  }
+
+  const session = await getSession({ req });
+  console.log(req);
+  if (!session) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const user = await User.findOne({ email: session.user.email });
+  if (!user) {
+    return res.status(404).json({ message: "user not found" });
+  }
+
+  if (req.method === "POST") {
+    const { title, description, status } = req.body;
+    if (!title || !description || !status) {
+      return res.status(422).json({ message: "Invalid data" });
+    }
+
+    user.todos.push({ title, description, status });
+    await user.save();
+    res.status(200).json({ message: "Todo created successfully!" });
+  } else if (req.method === "GET") {
+  }
+}
+</file>
+
+<file path="src/pages/signin.js">
+import React from "react";
+import SigninPage from "../../components/templates/signinPage";
+
+function Signin() {
+  return <SigninPage />;
+}
+
+export default Signin;
+</file>
+
+<file path="src/pages/signup.js">
+import React from "react";
+import SignupPage from "../../components/templates/signupPage";
+
+function Signup() {
+  return <SignupPage />;
+}
+
+export default Signup;
+</file>
+
+<file path="utils/auth.js">
+import { hash, compare } from "bcryptjs";
+
+async function hashPassword(password) {
+  const hashedPassword = await hash(password, 12);
+  return hashedPassword;
+}
+
+async function verifyPassword(password, hashedPassword) {
+  const isValid = await compare(password, hashedPassword);
+  return isValid;
+}
+
+export { hashPassword, verifyPassword };
+</file>
+
+<file path="utils/connectDB.js">
+import mongoose from "mongoose";
+
+async function connectDB() {
+  if (mongoose.connections[0].readyState) return;
+  mongoose.set("strictQuery", false);
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("Connected to DB");
+}
+
+export default connectDB;
+</file>
+
+<file path=".gitignore">
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+</file>
+
+<file path="eslint.config.mjs">
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+</file>
+
+<file path="jsconfig.json">
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+</file>
+
+<file path="LICENSE">
+MIT License
+
+Copyright (c) 2026 AHMADREZA SOROUSH
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</file>
+
+<file path="next.config.mjs">
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  /* config options here */
+  reactCompiler: true,
+  reactStrictMode: true,
+};
+
+export default nextConfig;
+</file>
+
+<file path="package.json">
+{
+  "name": "nexatask",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.2",
+    "motion": "^12.34.3",
+    "next": "16.1.6",
+    "next-auth": "^4.24.13",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-icons": "^5.5.0",
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^10.0.2",
+    "eslint-config-next": "^0.2.4"
+  }
+}
+</file>
+
+<file path="public/file.svg">
+<svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
+</file>
+
+<file path="public/globe.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+</file>
+
+<file path="public/next.svg">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 394 80"><path fill="#000" d="M262 0h68.5v12.7h-27.2v66.6h-13.6V12.7H262V0ZM149 0v12.7H94v20.4h44.3v12.6H94v21h55v12.6H80.5V0h68.7zm34.3 0h-17.8l63.8 79.4h17.9l-32-39.7 32-39.6h-17.9l-23 28.6-23-28.6zm18.3 56.7-9-11-27.1 33.7h17.8l18.3-22.7z"/><path fill="#000" d="M81 79.3 17 0H0v79.3h13.6V17l50.2 62.3H81Zm252.6-.4c-1 0-1.8-.4-2.5-1s-1.1-1.6-1.1-2.6.3-1.8 1-2.5 1.6-1 2.6-1 1.8.3 2.5 1a3.4 3.4 0 0 1 .6 4.3 3.7 3.7 0 0 1-3 1.8zm23.2-33.5h6v23.3c0 2.1-.4 4-1.3 5.5a9.1 9.1 0 0 1-3.8 3.5c-1.6.8-3.5 1.3-5.7 1.3-2 0-3.7-.4-5.3-1s-2.8-1.8-3.7-3.2c-.9-1.3-1.4-3-1.4-5h6c.1.8.3 1.6.7 2.2s1 1.2 1.6 1.5c.7.4 1.5.5 2.4.5 1 0 1.8-.2 2.4-.6a4 4 0 0 0 1.6-1.8c.3-.8.5-1.8.5-3V45.5zm30.9 9.1a4.4 4.4 0 0 0-2-3.3 7.5 7.5 0 0 0-4.3-1.1c-1.3 0-2.4.2-3.3.5-.9.4-1.6 1-2 1.6a3.5 3.5 0 0 0-.3 4c.3.5.7.9 1.3 1.2l1.8 1 2 .5 3.2.8c1.3.3 2.5.7 3.7 1.2a13 13 0 0 1 3.2 1.8 8.1 8.1 0 0 1 3 6.5c0 2-.5 3.7-1.5 5.1a10 10 0 0 1-4.4 3.5c-1.8.8-4.1 1.2-6.8 1.2-2.6 0-4.9-.4-6.8-1.2-2-.8-3.4-2-4.5-3.5a10 10 0 0 1-1.7-5.6h6a5 5 0 0 0 3.5 4.6c1 .4 2.2.6 3.4.6 1.3 0 2.5-.2 3.5-.6 1-.4 1.8-1 2.4-1.7a4 4 0 0 0 .8-2.4c0-.9-.2-1.6-.7-2.2a11 11 0 0 0-2.1-1.4l-3.2-1-3.8-1c-2.8-.7-5-1.7-6.6-3.2a7.2 7.2 0 0 1-2.4-5.7 8 8 0 0 1 1.7-5 10 10 0 0 1 4.3-3.5c2-.8 4-1.2 6.4-1.2 2.3 0 4.4.4 6.2 1.2 1.8.8 3.2 2 4.3 3.4 1 1.4 1.5 3 1.5 5h-5.8z"/></svg>
+</file>
+
+<file path="public/vercel.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1155 1000"><path d="m577.3 0 577.4 1000H0z" fill="#fff"/></svg>
+</file>
+
+<file path="public/window.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.5h13v10a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1zM0 1h16v11.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 0 12.5zm3.75 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M7 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5" fill="#666"/></svg>
+</file>
+
+<file path="README.md">
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+
+[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+
+This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+</file>
+
+<file path="src/pages/_app.js">
+import "@/styles/globals.css";
+import Layout from "../../components/layout/Layout";
+import { SessionProvider } from "next-auth/react";
+
+export default function App({ Component, pageProps }) {
+  return (
+    <SessionProvider session={pageProps.session}>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </SessionProvider>
+  );
+}
+</file>
+
+<file path="src/pages/_document.js">
+import { Html, Head, Main, NextScript } from "next/document";
+
+export default function Document() {
+  return (
+    <Html lang="en">
+      <Head />
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
+</file>
+
+<file path="src/pages/index.js">
+export default function Home() {
+  return <h1>NexaTask</h1>;
+}
+</file>
+
+<file path="src/styles/globals.css">
+html,
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+header {
+  background-color: #3f47f4;
+  height: 150px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 20px 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+header button {
+  background-color: #3f47f4;
+  border: 1px solid #fff;
+  height: fit-content;
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 5px 10px;
+}
+
+header button svg {
+  margin-left: 10px;
+}
+
+.container--main {
+  display: flex;
+  min-height: calc(100vh - 150px);
+}
+
+aside {
+  background-color: #fff;
+  width: 250px;
+  position: relative;
+  bottom: 80px;
+  border-top-right-radius: 20px;
+  color: #7f7e86;
+  padding: 30px 0 0 30px;
+}
+aside p {
+  color: #494a52;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+aside li {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: F4F5FA;
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+aside li a {
+  margin-left: 10px;
+}
+
+li {
+  list-style: none;
+}
+
+section {
+  background-color: #f4f5fa;
+  flex-grow: 1;
+  padding: 10px;
+  /* width: 100%; */
+}
+
+h2 {
+  color: #494a52;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+h2 svg {
+  margin-right: 10px;
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.add-form__input {
+  margin-top: 20px;
+}
+
+.add-form__input--first {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 50px;
+}
+
+label {
+  color: #7f7e86;
+  font-size: 1.3rem;
+}
+
+input {
+  border: none;
+  border-radius: 8px;
+  margin-top: 5px;
+  background-color: #fff;
+  color: #7f7e86;
+  font-size: 1rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  padding: 5px 15px;
+  height: 35px;
+  outline: none;
+  max-width: 500px;
+}
+
+.add-form__input--second {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.add-form__input--second div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: white;
+  margin: 10px 0;
+}
+
+.add-form__input--second input {
+  box-shadow: none;
+  margin-left: 10px;
+  width: 18px;
+}
+
+.add-form__input--second label {
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.add-form__input--second label svg {
+  margin-right: 10px;
+}
+
+.add-form__input--second .todo {
+  background-color: #f2b82e;
+}
+
+.add-form__input--second .inProgress {
+  background-color: #1be2b1;
+}
+
+.add-form__input--second .review {
+  background-color: #3f79f7;
+}
+
+.add-form__input--second .done {
+  background-color: #14d3e2;
+}
+
+button {
+  border: none;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  background-color: #d6d6d6;
+  color: #727272;
+  padding: 5px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.profile-form {
+  padding: 20px;
+}
+
+.profile-form__input {
+  margin-top: 20px;
+}
+
+.profile-form__input div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.profile-data {
+  margin-top: 20px;
+}
+
+.profile-data div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.profile-data span {
+  color: #7f7e86;
+  font-size: 1rem;
+  margin-right: 5px;
+}
+
+.profile-data p {
+  font-size: 1.2rem;
+  color: #494a52;
+  font-weight: 500;
+}
+
+.home-page {
+  display: flex;
+  justify-content: space-between;
+}
+
+.home-page div {
+  background-color: #fff;
+  margin: 20px;
+  border-radius: 5px;
+  flex-grow: 1;
+}
+
+.home-page p {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding: 5px;
+  text-align: center;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.home-page--todo p {
+  background-color: #f2b82e;
+}
+
+.home-page--inProgress p {
+  background-color: #1be2b1;
+}
+
+.home-page--review p {
+  background-color: #3f79f7;
+}
+
+.home-page--done p {
+  background-color: #14d3e2;
+}
+
+.home-page .tasks {
+  margin: 0;
+}
+
+.tasks .tasks__card {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  padding: 15px;
+  margin: 25px 15px;
+}
+
+.tasks .tasks__card span {
+  width: 50%;
+  height: 3px;
+  display: block;
+  margin-bottom: 30px;
+  border-radius: 2px;
+}
+
+.tasks .tasks__card span.todo {
+  background-color: #f2b82e;
+}
+.tasks .tasks__card span.inProgress {
+  background-color: #1be2b1;
+}
+.tasks .tasks__card span.review {
+  background-color: #3f79f7;
+}
+.tasks .tasks__card span.done {
+  background-color: #14d3e2;
+}
+
+.tasks .tasks__card h4 {
+  color: #494a52;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.tasks .tasks__card div {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  margin: 25px 0 0 0;
+}
+
+.tasks .tasks__card div button {
+  padding: 5px 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.tasks .tasks__card div .button-next {
+  background-color: #cdf8ee;
+  color: #03ab81;
+}
+
+.tasks .tasks__card div .button-back {
+  background-color: #f8eccf;
+  color: #e5a000;
+}
+
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  align-items: center;
+  margin: auto;
+  margin-top: 100px;
+  padding: 50px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  background-color: #fff;
+  border-radius: 20px;
+}
+
+.signin-form h3 {
+  color: #494a52;
+  margin-bottom: 50px;
+}
+
+.signin-form input {
+  margin-bottom: 30px;
+}
+
+.signin-form div {
+  margin-top: 50px;
+  display: flex;
+  color: #7f7e86;
+}
+
+.signin-form a {
+  color: #3f47f4;
+}
+
+.add-form__input--third {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.add-form__input--third div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: white;
+  margin: 10px 0;
+}
+
+.add-form__input--third input {
+  box-shadow: none;
+  margin-left: 10px;
+  width: 18px;
+}
+
+.add-form__input--third label {
+  color: rgb(247, 8, 8);
+  display: flex;
+  align-items: center;
+}
+
+.add-form__input--third label svg {
+  margin-right: 10px;
+}
+
+.add-form__input--third textarea {
+  color: #e5a000;
+  height: 50px;
+  width: 300px;
+  max-height: 50px;
+  max-width: 800px;
+  min-width: 300px;
+  border: none;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+</file>
+
+</files>
